@@ -4,8 +4,10 @@ dotenv.config();
 
 export const config = {
   polymarket: {
-    apiUrl: process.env.POLYMARKET_API_URL || 'https://clob.polymarket.com',
+    apiUrl: process.env.POLYMARKET_API_URL || 'https://clob. polymarket.com',
     chainId: parseInt(process.env.POLYMARKET_CHAIN_ID || '137'),
+    rpcUrl: process.env.POLYGON_RPC_URL || 'https://polygon-rpc.com',
+    useMock: process.env.USE_MOCK_API === 'true', // New:  Use mock API for testing
   },
   wallet: {
     privateKey: process.env.PRIVATE_KEY || '',
