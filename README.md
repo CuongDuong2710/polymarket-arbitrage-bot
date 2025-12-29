@@ -125,8 +125,8 @@ Key configuration options in `.env`:
 See [Issue #1](https://github.com/CuongDuong2710/polymarket-arbitrage-bot/issues/1) for the complete project plan.
 
 - [x] Initial project setup
-- [ ] Polymarket API integration
-- [ ] Market monitoring service
+- [x] Polymarket API integration
+- [x] Market monitoring service
 - [ ] Arbitrage detection engine
 - [ ] Trade execution module
 - [ ] Risk management system

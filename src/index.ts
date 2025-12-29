@@ -6,6 +6,7 @@ import ArbitrageDetector from './services/ArbitrageDetector';
 import TradeExecutor from './services/TradeExecutor';
 import RiskManager from './services/RiskManager';
 import PolymarketClient from './api/PolymarketClient';
+import { MonitoringEventType } from './models/Events';
 
 const app = express();
 
@@ -19,6 +20,36 @@ const arbitrageDetector = new ArbitrageDetector();
 const tradeExecutor = new TradeExecutor();
 const riskManager = new RiskManager();
 
+// Set up event listeners
+marketMonitor.on(MonitoringEventType.MARKET_ADDED, (event) => {
+  logger.info(`📈 New market:  ${event.market.question}`);
+});
+
+marketMonitor.on(MonitoringEventType.MARKET_REMOVED, (event) => {
+  logger.info(`📉 Market removed: ${event.market.question}`);
+});
+
+marketMonitor.on(MonitoringEventType.PRICE_SPIKE, (event) => {
+  logger.warn(
+    `🚨 Price spike:  ${event.outcome} in market ${event.marketId} - ${(event.changePercentage * 100).toFixed(2)}% change`
+  );
+});
+
+marketMonitor.on(MonitoringEventType.PRICE_UPDATED, (event) => {
+  // Run arbitrage detection on price updates
+  const opportunities = arbitrageDetector.detectOpportunities(event.prices);
+
+  if (opportunities.length > 0) {
+    logger.info(
+      `💰 Found ${opportunities.length} arbitrage opportunities in market ${event.marketId}`
+    );
+  }
+});
+
+marketMonitor.on(MonitoringEventType.MONITORING_ERROR, (event) => {
+  logger.error(`❌ Monitoring error: ${event.error.message}`);
+});
+
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.json({
@@ -26,16 +57,23 @@ app.get('/health', (req, res) => {
     timestamp: new Date().toISOString(),
     trading: config.trading.enabled,
     mockMode: config.polymarket.useMock,
+    monitoring: marketMonitor.isMonitoring(),
   });
 });
 
-// API routes
+// Statistics endpoint
+app.get('/api/stats', (req, res) => {
+  const stats = marketMonitor.getStatistics();
+  res.json(stats);
+});
+
+// Markets endpoints
 app.get('/api/markets', (req, res) => {
   const markets = marketMonitor.getMarkets();
   res.json({ markets, count: markets.length });
 });
 
-app.get('/api/markets/:marketId', (req, res) => {
+app.get('/api/markets/: marketId', (req, res) => {
   const { marketId } = req.params;
   const market = marketMonitor.getMarket(marketId);
 
@@ -44,7 +82,9 @@ app.get('/api/markets/:marketId', (req, res) => {
   }
 
   const prices = marketMonitor.getPrices(marketId);
-  res.json({ market, prices });
+  const state = marketMonitor.getMarketState(marketId);
+
+  res.json({ market, prices, state });
 });
 
 app.get('/api/markets/:marketId/prices', (req, res) => {
@@ -58,6 +98,17 @@ app.get('/api/markets/:marketId/prices', (req, res) => {
   res.json({ marketId, prices, count: prices.length });
 });
 
+app.get('/api/markets/:marketId/state', (req, res) => {
+  const { marketId } = req.params;
+  const state = marketMonitor.getMarketState(marketId);
+
+  if (!state) {
+    return res.status(404).json({ error: 'Market state not found' });
+  }
+
+  res.json(state);
+});
+
 app.get('/api/trending', async (req, res) => {
   try {
     const trending = await marketMonitor.getTrendingMarkets();
@@ -67,6 +118,13 @@ app.get('/api/trending', async (req, res) => {
   }
 });
 
+app.get('/api/volatile', (req, res) => {
+  const limit = parseInt(req.query.limit as string) || 10;
+  const volatile = marketMonitor.getTopVolatileMarkets(limit);
+  res.json({ markets: volatile, count: volatile.length });
+});
+
+// Position and trade endpoints
 app.get('/api/positions', (req, res) => {
   const positions = riskManager.getPositions();
   res.json({ positions, totalExposure: riskManager.getTotalExposure() });
@@ -84,7 +142,7 @@ const startServer = async () => {
 
     // Validate configuration
     if (!config.wallet.privateKey && config.trading.enabled) {
-      logger.error('Private key not configured.  Set TRADING_ENABLED=false or add PRIVATE_KEY');
+      logger.error('Private key not configured. Set TRADING_ENABLED=false or add PRIVATE_KEY');
       process.exit(1);
     }
 
