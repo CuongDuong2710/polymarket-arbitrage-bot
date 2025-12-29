@@ -30,12 +30,12 @@ app.get('/api/markets', (req, res) => {
 
 app.get('/api/positions', (req, res) => {
   const positions = riskManager.getPositions();
-  res.json({ positions, totalExposure: riskManager. getTotalExposure() });
+  res.json({ positions, totalExposure: riskManager.getTotalExposure() });
 });
 
 app.get('/api/trades/pending', (req, res) => {
   const trades = tradeExecutor.getPendingTrades();
-  res.json({ trades, count: trades. length });
+  res.json({ trades, count: trades.length });
 });
 
 // Start server
@@ -52,7 +52,7 @@ const startServer = async () => {
 
     // Start Express server
     app.listen(config.server.port, () => {
-      logger.info(`🚀 Polymarket Arbitrage Bot running on port ${config.server. port}`);
+      logger.info(`🚀 Polymarket Arbitrage Bot running on port ${config.server.port}`);
       logger.info(`📊 Trading enabled: ${config.trading.enabled}`);
       logger.info(`💰 Min profit threshold: ${config.trading.minProfitThreshold * 100}%`);
       logger.info(`📈 Max position size: ${config.trading.maxPositionSize}`);
@@ -72,7 +72,7 @@ process.on('SIGINT', async () => {
 
 process.on('SIGTERM', async () => {
   logger.info('Shutting down gracefully.. .');
-  await marketMonitor. stop();
+  await marketMonitor.stop();
   process.exit(0);
 });
 

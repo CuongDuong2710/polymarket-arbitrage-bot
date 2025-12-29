@@ -18,7 +18,7 @@ export interface Trade {
   amount: number;
   price: number;
   status: TradeStatus;
-  txHash?:  string;
+  txHash?: string;
   createdAt: Date;
   executedAt?: Date;
   profit?: number;

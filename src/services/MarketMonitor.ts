@@ -17,8 +17,8 @@ export class MarketMonitor {
     }
 
     this.isRunning = true;
-    logger. info('MarketMonitor started');
-    
+    logger.info('MarketMonitor started');
+
     // TODO: Implement market monitoring logic
   }
 
@@ -40,7 +40,7 @@ export class MarketMonitor {
   }
 
   getMarkets(): Market[] {
-    return Array.from(this.markets. values());
+    return Array.from(this.markets.values());
   }
 }
 

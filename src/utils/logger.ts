@@ -12,7 +12,7 @@ const logFormat = winston.format.combine(
 const consoleFormat = winston.format.combine(
   winston.format.colorize(),
   winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm: ss' }),
-  winston.format.printf(({ timestamp, level, message, ... meta }) => {
+  winston.format.printf(({ timestamp, level, message, ...meta }) => {
     let metaStr = '';
     if (Object.keys(meta).length > 0) {
       metaStr = '\n' + JSON.stringify(meta, null, 2);
@@ -24,7 +24,7 @@ const consoleFormat = winston.format.combine(
 export const logger = winston.createLogger({
   level: config.monitoring.logLevel,
   format: logFormat,
-  transports:  [
+  transports: [
     new winston.transports.File({
       filename: path.join('logs', 'error.log'),
       level: 'error',

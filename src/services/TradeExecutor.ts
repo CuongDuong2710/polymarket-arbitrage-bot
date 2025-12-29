@@ -19,7 +19,7 @@ export class TradeExecutor {
     logger.info(`Executing arbitrage trade for market ${opportunity.marketId}`);
 
     // TODO: Implement actual trade execution
-    const trades:  Trade[] = [];
+    const trades: Trade[] = [];
 
     return trades;
   }

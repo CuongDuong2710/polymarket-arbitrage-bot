@@ -56,7 +56,7 @@ export class RiskManager {
         outcome,
         quantity,
         averagePrice: price,
-        currentPrice:  price,
+        currentPrice: price,
         unrealizedPnL: 0,
         realizedPnL: 0,
       });
