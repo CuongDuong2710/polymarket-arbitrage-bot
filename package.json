@@ -13,7 +13,6 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "test:api": "ts-node src/test-api.ts",
     "test:monitoring": "ts-node src/test-monitoring.ts"
-
   },
   "keywords": [
     "polymarket",
@@ -38,6 +37,7 @@
     "ethers": "^5.8.0",
     "eventemitter3": "^5.0.1",
     "express": "^5.2.1",
+    "uuid": "^13.0.0",
     "winston": "^3.19.0",
     "ws": "^8.18.3"
   },
@@ -45,6 +45,7 @@
     "@types/eventemitter3": "^2.0.4",
     "@types/express": "^5.0.6",
     "@types/node": "^25.0.3",
+    "@types/uuid": "^11.0.0",
     "@types/ws": "^8.18.1",
     "@typescript-eslint/eslint-plugin": "^8.50.1",
     "@typescript-eslint/parser": "^8.50.1",
